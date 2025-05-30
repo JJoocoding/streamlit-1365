@@ -50,14 +50,13 @@ if st.button("분석 시작") and Gongo_Nm:
             response4 = requests.get(url4)
             items = json.loads(json.dumps(xmltodict.parse(response4.text)))['response']['body']['items']['item']
             df4 = pd.DataFrame(items)
+             # ▶ 1순위 업체는 API 데이터에서 첫 번째 업체명
+            top_bidder = df4.iloc[0]['prcbdrNm']
             df4['bidprcAmt'] = pd.to_numeric(df4['bidprcAmt'])
             df4['rate'] = (((df4['bidprcAmt'] - A_value) * 100 / sucsfbidLwltRate) + A_value) * 100 / base_price
             df4 = df4.drop_duplicates(['rate'])
             df4 = df4[(df4['rate'] >= 98) & (df4['rate'] <= 102)].copy()
             df4 = df4[['prcbdrNm', 'rate']].rename(columns={'prcbdrNm': '업체명'})
-
-            # ▶ 1순위 업체는 API 데이터에서 첫 번째 업체명
-            top_bidder = df4.iloc[0]['업체명']
 
             # ▶ 사정율 + 업체명 결합
             df_combined = pd.concat([
