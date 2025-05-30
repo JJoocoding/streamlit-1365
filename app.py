@@ -76,7 +76,7 @@ if st.button("분석 시작") and Gongo_Nm:
 
             # ▶ 결과 출력
             st.subheader("📈 분석 결과")
-            st.dataframe(df_combined[['rate', '업체명']], use_container_width=True)
+            st.dataframe(df_combined[['rate', '업체명']], use_container_width=use_wide)
 
             # ▶ 엑셀 다운로드 기능
             now = datetime.now().strftime("%Y%m%d_%H%M%S")
