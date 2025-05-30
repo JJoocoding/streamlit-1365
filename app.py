@@ -76,14 +76,14 @@ if st.button("분석 시작") and Gongo_Nm:
 
             # ▶ 결과 출력
             st.subheader("📈 분석 결과")
-            st.data_editor(
-                df_combined[['rate', '강조_업체명']],
-                use_container_width=True,
-                disabled=True,         # 편집은 막고 열 폭 조절은 가능하게 함
-                height=400             # 필요 시 높이 조절
-            )
+            # st.data_editor(
+            #     df_combined[['rate', '강조_업체명']],
+            #     use_container_width=True,
+            #     disabled=True,         # 편집은 막고 열 폭 조절은 가능하게 함
+            #     height=400             # 필요 시 높이 조절
+            # )
             
-            # st.dataframe(df_combined[['rate', '강조_업체명']], use_container_width=use_wide)
+            st.dataframe(df_combined[['rate', '강조_업체명']], use_container_width=use_wide)
 
             # ▶ 엑셀 다운로드 기능
             now = datetime.now().strftime("%Y%m%d_%H%M%S")
