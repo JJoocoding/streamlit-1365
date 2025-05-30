@@ -45,7 +45,7 @@ if st.button("분석 시작") and Gongo_Nm:
             cost_cols = ['sftyMngcst','sftyChckMngcst','rtrfundNon','mrfnHealthInsrprm','npnInsrprm','odsnLngtrmrcprInsrprm','qltyMngcst']
             A_value = df3[cost_cols].apply(pd.to_numeric).sum(axis=1).iloc[0]
 
-            # ▶ 개찰결과
+            # ▶ 개찰결과 (여기서 맨 첫 번째 업체가 1순위)
             url4 = f'http://apis.data.go.kr/1230000/as/ScsbidInfoService/getOpengResultListInfoOpengCompt?serviceKey={service_key}&pageNo=1&numOfRows=999&bidNtceNo={Gongo_Nm}'
             response4 = requests.get(url4)
             items = json.loads(json.dumps(xmltodict.parse(response4.text)))['response']['body']['items']['item']
@@ -56,6 +56,9 @@ if st.button("분석 시작") and Gongo_Nm:
             df4 = df4[(df4['rate'] >= 98) & (df4['rate'] <= 102)].copy()
             df4 = df4[['prcbdrNm', 'rate']].rename(columns={'prcbdrNm': '업체명'})
 
+            # ▶ 1순위 업체는 API 데이터에서 첫 번째 업체명
+            top_bidder = df4.iloc[0]['업체명']
+
             # ▶ 사정율 + 업체명 결합
             df_combined = pd.concat([
                 df_rates[['rate', '조합순번']].rename(columns={'조합순번': '업체명'}),
@@ -63,14 +66,16 @@ if st.button("분석 시작") and Gongo_Nm:
             ], ignore_index=True).sort_values('rate').reset_index(drop=True)
             df_combined['rate'] = round(df_combined['rate'], 5)
 
-            # ▶ 시각화: 1순위 업체 강조
+            # ▶ 강조 컬럼 추가: 1순위 업체명과 일치하면 강조
+            df_combined['강조_업체명'] = df_combined['업체명'].apply(
+                lambda x: f"🟢 {x}" if x == top_bidder else x
+            )
+
+            # ▶ 결과 출력
             st.subheader("📈 분석 결과")
-            top_bidder = df4.sort_values('rate').iloc[0]['업체명']
-            df_combined['강조'] = df_combined['업체명'].apply(lambda x: '🟢 ' + x if x == top_bidder else x)
+            st.dataframe(df_combined[['rate', '강조_업체명']], use_container_width=True)
 
-            st.dataframe(df_combined[['rate', '강조']], use_container_width=True)
-
-            # ▶ 다운로드
+            # ▶ 엑셀 다운로드 기능
             now = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"사정율분석_{Gongo_Nm}_{now}.xlsx"
             df_combined[['rate', '업체명']].to_excel(filename, index=False)
