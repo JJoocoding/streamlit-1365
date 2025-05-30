@@ -11,6 +11,10 @@ st.set_page_config(layout="wide")
 st.title("🏗️ 1365 사정율 분석 도구")
 st.markdown("공고번호를 입력하면 복수예가 조합, 낙찰하한율, 개찰결과를 분석해 드립니다.")
 
+# ▶ 표 폭 조절 옵션 추가
+display_width = st.selectbox("📏 표 표시 너비 설정", ["자동(전체 너비)", "고정(좁게)"])
+use_wide = display_width == "자동(전체 너비)"
+
 # 사용자 입력
 Gongo_Nm = st.text_input("🔍 공고번호를 입력하세요", "")
 
@@ -72,7 +76,7 @@ if st.button("분석 시작") and Gongo_Nm:
 
             # ▶ 결과 출력
             st.subheader("📈 분석 결과")
-            st.dataframe(df_combined[['rate', '강조_업체명']], use_container_width=True)
+            st.dataframe(df_combined[['rate', '업체명']], use_container_width=True)
 
             # ▶ 엑셀 다운로드 기능
             now = datetime.now().strftime("%Y%m%d_%H%M%S")
